@@ -10,14 +10,20 @@ import play.Logger
  */
 object ContentService {
 	def getContent(url: String): HttpEntity = {
-    
-	    val req = new HttpGet(url);
-	    val client = new DefaultHttpClient();
-	
-	    val response = client.execute(req);
-	
-	    Logger.debug("Get url status {}, {} ", url, response.getStatusLine().getStatusCode().toString);
-	
-	    response.getEntity();
-	  }
+	    try {
+		    val req = new HttpGet(url);
+		    val client = new DefaultHttpClient();
+		
+		    val response = client.execute(req);
+		
+		    Logger.debug("Get url status {}, {} ", url, response.getStatusLine().getStatusCode().toString);
+		
+		    response.getEntity();
+	    } catch {
+	    	case e: Exception => {
+	    	  Logger.error(e.getMessage())
+	    	  null
+	    	}
+	    }
+	}
 }

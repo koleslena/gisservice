@@ -23,11 +23,17 @@ class RatingActor extends Actor  {
 	}
 	
 	def processFilial(id: String): Result  = {
-    	val ps: HttpEntity = ContentService.getContent("http://catalog.api.2gis.ru/profile?&version=1.3&key=" + KeyStore.KeyFof2GisApi + "&id=" + id);
-
-	    val json = EntityUtils.toString(ps);
-	    
-	    Json.parse(json).validate[Result].get
+		try {
+			val ps: HttpEntity = ContentService.getContent("http://catalog.api.2gis.ru/profile?&version=1.3&key=" + KeyStore.KeyFof2GisApi + "&id=" + id);
+			
+		    val json = EntityUtils.toString(ps);
+		    
+		    Json.parse(json).validate[Result].get		  
+		} catch {
+	    	case e: Exception => {
+	    	  Logger.error(e.getMessage())
+	    	  null
+	    	}
+	    }
     }    
-	
 }

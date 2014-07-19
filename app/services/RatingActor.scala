@@ -1,14 +1,13 @@
 package services
 
 import org.apache.http.HttpEntity
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.util.EntityUtils
 import akka.actor.Actor
 import play.api.libs.json.Json
 import utils.KeyStore
 import play.Logger
 import model.Result
+import akka.actor.actorRef2Scala
 
 /**
  * Created by elenko on 12.07.14.

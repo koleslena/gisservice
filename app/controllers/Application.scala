@@ -41,6 +41,6 @@ object Application extends Controller {
     
     val res = Await.result(listFuture, 1000000 second).asInstanceOf[List[List[Result]]].flatten
     
-	Ok(toJson(res.sorted.reverse))
+	Ok(toJson(res.sorted))
   }
 }

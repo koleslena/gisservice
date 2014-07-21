@@ -18,7 +18,7 @@ case class Result (
 	) extends Ordered[Result] {
 
 	def compare(other: Result) = {
-		(this.rating.toDouble - other.rating.toDouble).*(100).toInt
+		(other.rating.toDouble - this.rating.toDouble).*(100).toInt
   	}
 }
 		  

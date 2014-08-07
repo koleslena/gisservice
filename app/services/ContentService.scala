@@ -11,6 +11,7 @@ import play.Logger
 object ContentService {
 	def getContent(url: String): HttpEntity = {
 	    try {
+	    	
 		    val req = new HttpGet(url);
 		    val client = new DefaultHttpClient();
 		
@@ -18,7 +19,10 @@ object ContentService {
 		
 		    Logger.debug("Get url status {}, {} ", url, response.getStatusLine().getStatusCode().toString);
 		
-		    response.getEntity();
+		    if(response.getStatusLine().getStatusCode().equals(200))
+		    	response.getEntity();
+		    else
+		    	null
 	    } catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())

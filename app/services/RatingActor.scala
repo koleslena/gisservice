@@ -4,10 +4,10 @@ import org.apache.http.HttpEntity
 import org.apache.http.util.EntityUtils
 import akka.actor.Actor
 import play.api.libs.json.Json
-import utils.KeyStore
 import play.Logger
 import model.Result
 import akka.actor.actorRef2Scala
+import utils.UrlStore
 
 /**
  * Created by elenko on 12.07.14.
@@ -24,7 +24,7 @@ class RatingActor extends Actor  {
 	
 	def processFilial(id: String): Result  = {
 		try {
-			val ps: HttpEntity = ContentService.getContent("http://catalog.api.2gis.ru/profile?&version=1.3&key=" + KeyStore.KeyFof2GisApi + "&id=" + id);
+			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForProfile(id));
 			
 		    val json = EntityUtils.toString(ps);
 		    

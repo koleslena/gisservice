@@ -12,14 +12,10 @@ import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import services.procId
-import services.RatingActor
-import services.ContentService
 import model.Result
-import model.Id
-import services.city
-import services.FirmActor
+import services.ListCity
 import scala.collection.mutable.MutableList
+import services.ProcessActor
 
 /**
  * Created by elenko on 22.06.14.
@@ -34,11 +30,9 @@ object Application extends Controller {
     
     val listCity: List[String] = List("Новосибирск", "Омск", "Томск", "Кемерово", "Новокузнецк")
     
-    val listFuture = Future.traverse(listCity){ name =>
-      (system.actorOf(Props (new FirmActor(fir))) ? city(name))
-    }
+    val listFuture = system.actorOf(Props[ProcessActor]) ? ListCity(fir, listCity) 
     
-    val res = Await.result(listFuture, 1000000 second).asInstanceOf[List[List[Result]]].flatten
+    val res = Await.result(listFuture, 1000000 second).asInstanceOf[MutableList[Result]]
     
 	Ok(toJson(res.sorted))
   }

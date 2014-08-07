@@ -30,28 +30,25 @@ class FirmActor(fir: String) extends Actor {
 	  	sender ! processCity(name)
 	}
 	
-	def processCity(name: String): List[Result] = {
-		val ps: HttpEntity = ContentService.getContent(UrlStore.urlForSearch(name, fir));
-
-		if(ps != null) {
-		    val json = EntityUtils.toString(ps);
-			
-		    val obj = Json.parse(json);
-			
-		    val listId = (obj \ "result").validate[List[Id]].get
-		    
-		    val system = ActorSystem("gisservice")
-		    
-		    implicit val timeout = Timeout(20.second)
-		    
-		    val listFuture = Future.traverse(listId){ f =>
-		      (system.actorOf(Props (new RatingActor())) ? procId(f.id))
-		    }
-		    
-		    val res = Await.result(listFuture, 10000 second).asInstanceOf[List[Result]]
-		    
-		    res
-		} else
-			null
+	def processCity(name: String): ListId = {
+		try {
+			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForSearch(name, fir));
+	
+			if(ps != null) {
+			    val json = EntityUtils.toString(ps);
+				
+			    val obj = Json.parse(json);
+				
+			    val listId = (obj \ "result").validate[List[Id]].get
+			    
+			    new ListId(listId)
+			} else
+				new ListId(null)
+		} catch {
+	    	case e: Exception => {
+	    	  Logger.error(e.getMessage())
+	    	  new ListId(null)
+	    	}
+	    }
 	}
 }

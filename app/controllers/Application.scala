@@ -26,7 +26,7 @@ import scala.collection.mutable.MutableList
  */
 object Application extends Controller {
 	
-  def getFirms(fir: String) = Action {
+  def getFirms(fir: String) = Action.async {
        
     val system = ActorSystem("gisservice")
     
@@ -36,10 +36,10 @@ object Application extends Controller {
     
     val listFuture = Future.traverse(listCity){ name =>
       (system.actorOf(Props (new FirmActor(fir))) ? city(name))
+    }.mapTo[List[List[Result]]]
+    
+    listFuture.map {
+      res => Ok(toJson(res.flatten.sorted))
     }
-    
-    val res = Await.result(listFuture, 1000000 second).asInstanceOf[List[List[Result]]].flatten
-    
-	Ok(toJson(res.sorted))
   }
 }

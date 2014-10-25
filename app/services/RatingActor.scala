@@ -32,7 +32,7 @@ class RatingActor extends Actor  {
 		} catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())
-	    	  null
+	    	  Result("", "", "")
 	    	}
 	    }
     }    

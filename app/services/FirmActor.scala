@@ -20,6 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import model.Result
 import model.Id
 import utils.UrlStore
+import akka.pattern.pipe
 
 case class city(name: String)
 
@@ -27,10 +28,10 @@ class FirmActor(fir: String) extends Actor {
 	def receive = {
 	  case city(name) =>
 	    Logger.debug("Get firms in city {} ", name) 
-	  	sender ! processCity(name)
+	  	processCity(name) pipeTo sender
 	}
 	
-	def processCity(name: String): List[Result] = {
+	def processCity(name: String) = {
 		val ps: HttpEntity = ContentService.getContent(UrlStore.urlForSearch(name, fir));
 
 		if(ps != null) {
@@ -46,12 +47,14 @@ class FirmActor(fir: String) extends Actor {
 		    
 		    val listFuture = Future.traverse(listId){ f =>
 		      (system.actorOf(Props (new RatingActor())) ? procId(f.id))
-		    }
+		    }.mapTo[List[Result]]
 		    
-		    val res = Await.result(listFuture, 10000 second).asInstanceOf[List[Result]]
-		    
-		    res
-		} else
-			null
+		    listFuture
+		} else {
+		  val future = Future {
+			  "error"
+			}
+		  future
+		}
 	}
 }

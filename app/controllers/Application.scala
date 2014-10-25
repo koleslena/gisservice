@@ -22,7 +22,7 @@ import services.ProcessActor
  */
 object Application extends Controller {
 	
-  def getFirms(fir: String) = Action {
+  def getFirms(fir: String) = Action.async {
        
     val system = ActorSystem("gisservice")
     
@@ -30,10 +30,13 @@ object Application extends Controller {
     
     val listCity: List[String] = List("Новосибирск", "Омск", "Томск", "Кемерово", "Новокузнецк")
     
-    val listFuture = system.actorOf(Props[ProcessActor]) ? ListCity(fir, listCity) 
+    val listFuture = (system.actorOf(Props[ProcessActor]) ? ListCity(fir, listCity)).mapTo[MutableList[model.Result]]
     
-    val res = Await.result(listFuture, 1000000 second).asInstanceOf[MutableList[Result]]
-    
-	Ok(toJson(res.sorted))
+    listFuture.map { 
+       o: MutableList[model.Result] => Ok(toJson(o.sorted))
+	}.recover { 
+	  case _ => Ok(toJson("")) 
+	} 
+
   }
 }

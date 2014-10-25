@@ -16,10 +16,10 @@ case class ListIdAnswer(res: Result)
 
 class ProcessActor extends Actor {
 	
-	var countReqs = 0
-	var expectedReqs = 0
-	var selfSender:ActorRef = null
-	val resList: MutableList[Result] = new MutableList() 
+	private var countReqs = 0
+	private var expectedReqs = 0
+	private var selfSender:ActorRef = null
+	private val resList: MutableList[Result] = new MutableList() 
 	
 	def receive = {
 	  case ListCity(fir, list) =>

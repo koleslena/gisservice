@@ -28,10 +28,10 @@ object Application extends Controller {
     
     val listFuture = Future.traverse(listCity){ name =>
       (system.actorOf(Props (new FirmActor(fir))) ? city(name))
-    }.mapTo[List[List[Result]]]
+    }.mapTo[List[List[Option[Result]]]]
     
     listFuture.map {
-      res => Ok(toJson(res.flatten.sorted))
+      res => Ok(toJson(res.flatten.filter(_.isDefined).sorted))
     }
   }
 }

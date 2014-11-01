@@ -47,12 +47,12 @@ class FirmActor(fir: String) extends Actor {
 		    
 		    val listFuture = Future.traverse(listId){ f =>
 		      (system.actorOf(Props (new RatingActor())) ? procId(f.id))
-		    }.mapTo[List[Result]]
+		    }.mapTo[List[Option[Result]]]
 		    
 		    listFuture
 		} else {
 		  val future = Future {
-			  Result("", "", "")
+			  List(None)
 			}
 		  future
 		}

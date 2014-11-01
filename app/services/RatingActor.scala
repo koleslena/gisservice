@@ -22,17 +22,17 @@ class RatingActor extends Actor  {
 	  	sender ! processFilial(id)
 	}
 	
-	def processFilial(id: String): Result  = {
+	def processFilial(id: String): Option[Result]  = {
 		try {
 			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForProfile(id));
 			
 		    val json = EntityUtils.toString(ps);
 		    
-		    Json.parse(json).validate[Result].get		  
+		    Some(Json.parse(json).validate[Result].get)		  
 		} catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())
-	    	  Result("", "", "")
+	    	  None
 	    	}
 	    }
     }    

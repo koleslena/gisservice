@@ -9,11 +9,8 @@ import play.api.libs.json.Json
 import play.api.libs.json.Json.toJson
 import play.Logger
 import akka.util.Timeout
-import akka.actor.Props
-import akka.actor.ActorSystem
+import akka.actor.{Props, Actor}
 import akka.pattern.ask
-import akka.actor.Actor
-import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,13 +38,13 @@ class FirmActor(fir: String) extends Actor {
 				
 			    val listId = (obj \ "result").validate[List[Id]].get
 			    
-			    new ListId(listId)
+			    ListId(listId)
 			} else
-				new ListId(null)
+				ListId(List())
 		} catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())
-	    	  new ListId(null)
+	    	  ListId(List())
 	    	}
 	    }
 	}

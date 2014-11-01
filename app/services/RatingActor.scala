@@ -30,11 +30,11 @@ class RatingActor extends Actor  {
 		    
 		    val res = Json.parse(json).validate[Result].get
 		    
-		    new ListIdAnswer(res)
+		    ListIdAnswer(res)
 		} catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())
-	    	  new ListIdAnswer(null)
+	    	  ListIdAnswer(Result("","",""))
 	    	}
 	    }
     }    

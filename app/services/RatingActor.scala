@@ -1,12 +1,8 @@
 package services
 
-import org.apache.http.HttpEntity
-import org.apache.http.util.EntityUtils
 import akka.actor.Actor
-import play.api.libs.json.Json
 import play.Logger
 import model.Result
-import akka.actor.actorRef2Scala
 import utils.UrlStore
 
 /**
@@ -24,11 +20,7 @@ class RatingActor extends Actor  {
 	
 	def processFilial(id: String): Option[Result]  = {
 		try {
-			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForProfile(id)).get
-			
-		    val json = EntityUtils.toString(ps);
-		    
-		    Some(Json.parse(json).validate[Result].get)		  
+		    Some(ContentService.getJsValue(UrlStore.urlForProfile(id)).validate[Result].get)		  
 		} catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())

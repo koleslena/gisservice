@@ -24,7 +24,7 @@ class RatingActor extends Actor  {
 	
 	def processFilial(id: String): ListIdAnswer  = {
 		try {
-			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForProfile(id));
+			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForProfile(id)).get
 			
 		    val json = EntityUtils.toString(ps);
 		    

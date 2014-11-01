@@ -29,7 +29,7 @@ class FirmActor(fir: String) extends Actor {
 	
 	def processCity(name: String): ListId = {
 		try {
-			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForSearch(name, fir));
+			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForSearch(name, fir)).get
 	
 			if(ps != null) {
 			    val json = EntityUtils.toString(ps);

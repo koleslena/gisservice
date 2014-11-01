@@ -20,7 +20,11 @@ class RatingActor extends Actor  {
 	
 	def processFilial(id: String): Option[Result]  = {
 		try {
-		    Some(ContentService.getJsValue(UrlStore.urlForProfile(id)).validate[Result].get)		  
+		  val res = ContentService.getJsValue(UrlStore.urlForProfile(id)) match {
+		    case Some(x) => Some(x.validate[Result].get)
+		    case None => None
+		  }
+		  res	  
 		} catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())

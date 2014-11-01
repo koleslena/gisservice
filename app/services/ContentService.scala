@@ -15,7 +15,6 @@ import play.api.libs.json.JsValue
 object ContentService {
 	def getContent(url: String): Option[HttpEntity] = {
 	    try {
-	    	
 		    val req = new HttpGet(url)
 		    val client = new DefaultHttpClient()
 		
@@ -35,11 +34,15 @@ object ContentService {
 	    }
 	}
 	
-	def getJsValue(url:String):JsValue = {
-		val ps: HttpEntity = getContent(url).get
+	def getJsValue(url:String):Option[JsValue] = {
+		val ps = getContent(url)
 
-		val json = EntityUtils.toString(ps)
-			
-		Json.parse(json)
+		val json = ps match {
+		  case Some(p) => {
+		    Some(Json.parse(EntityUtils.toString(p)))
+		  }
+		  case None => None
+		}
+		json
 	}
 }

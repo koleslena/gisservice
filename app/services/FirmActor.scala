@@ -27,17 +27,28 @@ class FirmActor(fir: String) extends Actor {
 	
 	def processCity(name: String) = {
 	  	try {
-		    val obj = ContentService.getJsValue(UrlStore.urlForSearch(name, fir));
-			
-		    val listId = (obj \ "result").validate[List[Id]].get
+		    val obj = ContentService.getJsValue(UrlStore.urlForSearch(name, fir))
+		    
+		    val res = obj match {
+		      case Some(o) => {
+		        val listId = (o \ "result").validate[List[Id]].get
 			    
-		    implicit val timeout = Timeout(20.second)
-			    
-		    val listFuture = Future.traverse(listId){ f =>
-		      (context.actorOf(Props (new RatingActor())) ? procId(f.id))
-		    }.mapTo[List[Option[Result]]]
-			    
-		    listFuture
+			    implicit val timeout = Timeout(20.second)
+				    
+			    val listFuture = Future.traverse(listId){ f =>
+			      (context.actorOf(Props (new RatingActor())) ? procId(f.id))
+			    }.mapTo[List[Option[Result]]]
+				    
+			    listFuture
+		      }
+		      case None => {
+		        val future = Future {
+				  List(None)
+				}
+		        future
+		      }
+		    }
+		    res
 	  	} catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())

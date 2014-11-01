@@ -52,7 +52,7 @@ class FirmActor(fir: String) extends Actor {
 		    listFuture
 		} else {
 		  val future = Future {
-			  "error"
+			  Result("", "", "")
 			}
 		  future
 		}

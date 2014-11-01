@@ -32,29 +32,32 @@ class FirmActor(fir: String) extends Actor {
 	}
 	
 	def processCity(name: String) = {
-		val ps: HttpEntity = ContentService.getContent(UrlStore.urlForSearch(name, fir));
-
-		if(ps != null) {
+	  	try {
+			val ps: HttpEntity = ContentService.getContent(UrlStore.urlForSearch(name, fir)).get
+	
 		    val json = EntityUtils.toString(ps);
-			
+				
 		    val obj = Json.parse(json);
 			
 		    val listId = (obj \ "result").validate[List[Id]].get
-		    
+			    
 		    val system = ActorSystem("gisservice")
-		    
+			    
 		    implicit val timeout = Timeout(20.second)
-		    
+			    
 		    val listFuture = Future.traverse(listId){ f =>
 		      (system.actorOf(Props (new RatingActor())) ? procId(f.id))
 		    }.mapTo[List[Option[Result]]]
-		    
+			    
 		    listFuture
-		} else {
-		  val future = Future {
-			  List(None)
-			}
-		  future
+	  	} catch {
+	    	case e: Exception => {
+	    	  Logger.error(e.getMessage())
+			  val future = Future {
+				  List(None)
+				}
+			  future
+	    	}
 		}
 	}
 }

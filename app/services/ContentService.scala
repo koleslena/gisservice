@@ -9,24 +9,24 @@ import play.Logger
  * Created by elenko on 12.07.14.
  */
 object ContentService {
-	def getContent(url: String): HttpEntity = {
+	def getContent(url: String): Option[HttpEntity] = {
 	    try {
 	    	
-		    val req = new HttpGet(url);
-		    val client = new DefaultHttpClient();
+		    val req = new HttpGet(url)
+		    val client = new DefaultHttpClient()
 		
-		    val response = client.execute(req);
+		    val response = client.execute(req)
 		
-		    Logger.debug("Get url status {}, {} ", url, response.getStatusLine().getStatusCode().toString);
+		    Logger.debug("Get url status {}, {} ", url, response.getStatusLine().getStatusCode().toString)
 		
 		    if(response.getStatusLine().getStatusCode().equals(200))
-		    	response.getEntity();
+		    	Some(response.getEntity())
 		    else
-		    	null
+		    	None
 	    } catch {
 	    	case e: Exception => {
 	    	  Logger.error(e.getMessage())
-	    	  null
+	    	  None
 	    	}
 	    }
 	}

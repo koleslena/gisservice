@@ -30,16 +30,23 @@ class ContentService extends Actor {
 
       val lastSender = sender
 
-      val ps = WS.url(url).get().onComplete {
-          case Success(response) =>
-            Logger.debug("Get url status {}, {} ", url, response.statusText)
-            lastSender ! Try(response.json)
-          case Failure(er) =>
-            Logger.error("Get url status {}, {} ", url, er.getMessage())
-            lastSender ! Failure
+      val ps = Try(WS.url(url).get()) match {
+        case Success(res) => {
+          res.onComplete {
+            case Success(response) =>
+              Logger.debug("Get url status {}, {} ", url, response.statusText)
+              lastSender ! Try(response.json)
+            case Failure(er) => {
+              Logger.error("Get url status {}, {} ", url, er.getMessage())
+              lastSender ! Failure
+            }
+          }
         }
-
+        case Failure(er) => {
+          Logger.error("Get url status {}, {} ", url, er.getMessage())
+          lastSender ! Failure(er)
+        }
+      }
     }
-
 	}
 }

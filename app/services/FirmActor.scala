@@ -38,9 +38,10 @@ class FirmActor(fir: String) extends Actor {
         Logger.debug("Get firms in city on complete {} ")
         res match {
           case Success(v) => processCity(v) pipeTo lastSender
-          case Failure(e) =>
+          case Failure(e) => {
             Logger.error(e.getMessage())
             defaultRes pipeTo lastSender
+          }
         }
       }
     }
@@ -60,10 +61,10 @@ class FirmActor(fir: String) extends Actor {
 
         listFuture
       }
-
-      case error: JsError =>
+      case error: JsError => {
         Logger.error(JsError.toFlatJson(error).toString())
         defaultRes
+      }
     }
 	}
 }

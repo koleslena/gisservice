@@ -1,48 +1,45 @@
 package services
 
-import org.apache.http.HttpEntity
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.http.util.EntityUtils
 import play.Logger
 import play.api.libs.json.Json
 import play.api.libs.json.JsValue
-
+import play.api.libs.ws._
+import play.api.Play.current
+import scala.util.Try
+import akka.actor.Actor
+import akka.pattern.pipe
+import akka.pattern.ask
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Success
+import scala.util.Failure
 
 /**
  * Created by elenko on 12.07.14.
  */
-object ContentService {
-	def getContent(url: String): Option[HttpEntity] = {
-	    try {
-		    val req = new HttpGet(url)
-		    val client = new DefaultHttpClient()
-		
-		    val response = client.execute(req)
-		
-		    Logger.debug("Get url status {}, {} ", url, response.getStatusLine().getStatusCode().toString)
-		
-		    if(response.getStatusLine().getStatusCode().equals(200))
-		    	Some(response.getEntity())
-		    else
-		    	None
-	    } catch {
-	    	case e: Exception => {
-	    	  Logger.error(e.getMessage())
-	    	  None
-	    	}
-	    }
-	}
-	
-	def getJsValue(url:String):Option[JsValue] = {
-		val ps = getContent(url)
+case class UrlSearch(url: String)
+case class Response(value: Try[JsValue])
 
-		val json = ps match {
-		  case Some(p) => {
-		    Some(Json.parse(EntityUtils.toString(p)))
-		  }
-		  case None => None
-		}
-		json
+class ContentService extends Actor {
+	def receive = {
+	  case UrlSearch(url) => {
+      Logger.debug("Get utl {} ", url)
+
+      implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+      val lastSender = sender
+
+      val ps = WS.url(url).get().onComplete {
+          case Success(response) =>
+            Logger.debug("Get url status {}, {} ", url, response.statusText)
+            lastSender ! Try(response.json)
+          case Failure(er) =>
+            Logger.error("Get url status {}, {} ", url, er.getMessage())
+            lastSender ! Failure
+        }
+
+    }
+
 	}
 }
